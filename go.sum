@@ -1,0 +1,6 @@
+github.com/NubeIO/lib-schema v0.2.18 h1:PmoZAdZFg22zZaXO29hYRL5a/IwZPXAEM9okY5x0A4M=
+github.com/NubeIO/lib-schema v0.2.18/go.mod h1:TGKDA6IIWHDwr5Aabawj6FF7NXUWXqu4ozWfph/hIjw=
+github.com/NubeIO/reactive v0.0.1 h1:+HCwE9c74YIAkmTKLb8Ow5ZDSGFo9bvRLLFZwwe0nvY=
+github.com/NubeIO/reactive v0.0.1/go.mod h1:cnprM7eDFv+SSoNWpmQ7nJ7VLCGlKeSJ+YMiFtmH82s=
+github.com/google/uuid v1.5.0 h1:1p67kYwdtXjb0gL0BPiP1Av9wiZPo5A8z2cWkTZ+eyU=
+github.com/google/uuid v1.5.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
