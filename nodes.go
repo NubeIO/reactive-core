@@ -8,13 +8,13 @@ import (
 	"time"
 )
 
-// TriggerNode generates random values at regular intervals.
-type TriggerNode struct {
+// triggerNode generates random values at regular intervals.
+type triggerNode struct {
 	*reactive.BaseNode
 	stop chan struct{}
 }
 
-// NewTriggerNode creates a new TriggerNode with the given ID, name, EventBus, and Flow.
+// NewTriggerNode creates a new triggerNode with the given ID, name, EventBus, and Flow.
 func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
 	node := reactive.NewBaseNode("trigger-float", nodeUUID, name, bus)
 	node.NewOutputPort(constants.Output, constants.Output, "float")
@@ -22,16 +22,16 @@ func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, opts *reactiv
 		node.Meta = opts.Meta
 		node.AddToNodesMap(nodeUUID, node)
 	}
-	return &TriggerNode{BaseNode: node}
+	return &triggerNode{BaseNode: node}
 }
 
-func (n *TriggerNode) New(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
+func (n *triggerNode) New(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
 	newNode := NewTriggerNode(nodeUUID, name, bus, opts)
 	//Node[newNode.GetID()] = newNode
 	return newNode
 }
 
-func (n *TriggerNode) Start() {
+func (n *triggerNode) Start() {
 	go func() {
 		ticker := time.NewTicker(2000 * time.Millisecond)
 		defer ticker.Stop()
@@ -57,12 +57,12 @@ func (n *TriggerNode) Start() {
 	}()
 }
 
-func (n *TriggerNode) Delete() {
+func (n *triggerNode) Delete() {
 	close(n.stop)
 	n.RemoveFromNodesMap()
 }
 
-func (n *TriggerNode) BuildSchema() *schemas.Schema {
+func (n *triggerNode) BuildSchema() *schemas.Schema {
 	return nil
 }
 
@@ -72,7 +72,7 @@ func randFloat() float64 {
 	return float64(int(randomFloat))
 }
 
-type TriggerBool struct {
+type triggerBool struct {
 	*reactive.BaseNode
 	stop chan struct{}
 }
@@ -84,16 +84,16 @@ func NewTriggerBool(nodeUUID, name string, bus *reactive.EventBus, opts *reactiv
 		node.Meta = opts.Meta
 		node.AddToNodesMap(nodeUUID, node)
 	}
-	return &TriggerBool{BaseNode: node}
+	return &triggerBool{BaseNode: node}
 }
 
-func (n *TriggerBool) New(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
+func (n *triggerBool) New(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
 	newNode := NewTriggerBool(nodeUUID, name, bus, opts)
 	//Node[newNode.GetID()] = newNode
 	return newNode
 }
 
-func (n *TriggerBool) Start() {
+func (n *triggerBool) Start() {
 	go func() {
 		ticker := time.NewTicker(2000 * time.Millisecond)
 		defer ticker.Stop()
@@ -119,14 +119,15 @@ func (n *TriggerBool) Start() {
 	}()
 }
 
-func (n *TriggerBool) Delete() {
+func (n *triggerBool) Delete() {
 	close(n.stop)
 	n.RemoveFromNodesMap()
 }
 
-func (n *TriggerBool) BuildSchema() *schemas.Schema {
+func (n *triggerBool) BuildSchema() *schemas.Schema {
 	return nil
 }
 
-var Node1 TriggerNode
-var Node2 TriggerBool
+// exports
+var TriggerNode triggerNode
+var TriggerBool triggerBool
