@@ -3,35 +3,45 @@ package main
 import (
 	"github.com/NubeIO/reactive"
 	"github.com/NubeIO/reactive-nodes/constants"
-	"github.com/NubeIO/reactive/schemas"
 	"math/rand"
 	"time"
 )
 
-// triggerNode generates random values at regular intervals.
-type triggerNode struct {
+type portDataType string
+
+const (
+	portTypeAny    portDataType = "any"
+	portTypeFloat  portDataType = "float"
+	portTypeString portDataType = "string"
+	portTypeBool   portDataType = "bool"
+)
+
+// triggerFloat generates random values at regular intervals.
+type triggerFloat struct {
 	*reactive.BaseNode
 	stop chan struct{}
 }
 
-// NewTriggerNode creates a new triggerNode with the given ID, name, EventBus, and Flow.
-func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
+// NewTriggerNode creates a new triggerFloat with the given ID, name, EventBus, and Flow.
+func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
 	node := reactive.NewBaseNode("trigger-float", nodeUUID, name, bus)
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	if opts != nil {
 		node.Meta = opts.Meta
-		node.AddToNodesMap(nodeUUID, node)
 	}
-	return &triggerNode{BaseNode: node}
+	return &triggerFloat{
+		BaseNode: node,
+		stop:     make(chan struct{}),
+	}
+
 }
 
-func (n *triggerNode) New(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
-	newNode := NewTriggerNode(nodeUUID, name, bus, opts)
-	//Node[newNode.GetID()] = newNode
+func (n *triggerFloat) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
+	newNode := NewTriggerNode(nodeUUID, name, bus, settings, opts)
 	return newNode
 }
 
-func (n *triggerNode) Start() {
+func (n *triggerFloat) Start() {
 	go func() {
 		ticker := time.NewTicker(2000 * time.Millisecond)
 		defer ticker.Stop()
@@ -57,13 +67,13 @@ func (n *triggerNode) Start() {
 	}()
 }
 
-func (n *triggerNode) Delete() {
+func (n *triggerFloat) Delete() {
 	close(n.stop)
-	n.RemoveFromNodesMap()
+	n.RemoveNodeFromRuntime()
 }
 
-func (n *triggerNode) BuildSchema() *schemas.Schema {
-	return nil
+func (n *triggerFloat) BuildSchema() {
+
 }
 
 func randFloat() float64 {
@@ -74,22 +84,24 @@ func randFloat() float64 {
 
 type triggerBool struct {
 	*reactive.BaseNode
-	stop chan struct{}
+	stop      chan struct{}
+	lastValue bool
 }
 
-func NewTriggerBool(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
+func NewTriggerBool(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
 	node := reactive.NewBaseNode("trigger-bool", nodeUUID, name, bus)
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	if opts != nil {
 		node.Meta = opts.Meta
-		node.AddToNodesMap(nodeUUID, node)
 	}
-	return &triggerBool{BaseNode: node}
+	return &triggerBool{
+		BaseNode: node,
+		stop:     make(chan struct{}),
+	}
 }
 
-func (n *triggerBool) New(nodeUUID, name string, bus *reactive.EventBus, opts *reactive.NodeOpts) reactive.Node {
-	newNode := NewTriggerBool(nodeUUID, name, bus, opts)
-	//Node[newNode.GetID()] = newNode
+func (n *triggerBool) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
+	newNode := NewTriggerBool(nodeUUID, name, bus, settings, opts)
 	return newNode
 }
 
@@ -104,11 +116,11 @@ func (n *triggerBool) Start() {
 				case <-n.stop:
 					return // Stop triggering when the stopTrigger channel is closed
 				default:
-					ranValue := randFloat()
+					n.lastValue = !n.lastValue
 					out := &reactive.Port{
 						ID:        constants.Output,
 						Name:      constants.Output,
-						Value:     ranValue,
+						Value:     n.lastValue,
 						Direction: "output",
 						DataType:  "float",
 					}
@@ -121,13 +133,13 @@ func (n *triggerBool) Start() {
 
 func (n *triggerBool) Delete() {
 	close(n.stop)
-	n.RemoveFromNodesMap()
+	n.RemoveNodeFromRuntime()
 }
 
-func (n *triggerBool) BuildSchema() *schemas.Schema {
-	return nil
+func (n *triggerBool) BuildSchema() {
+
 }
 
 // exports
-var TriggerNode triggerNode
+var TriggerFloat triggerFloat
 var TriggerBool triggerBool

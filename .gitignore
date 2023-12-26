@@ -8,6 +8,8 @@ plugins
 *.code
 runtime/logs/*
 
+mycli
+
 *.exe
 *.exe~
 *.dll
