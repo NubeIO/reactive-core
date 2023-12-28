@@ -25,5 +25,6 @@ func (p *pluginExport) Get() *plugins.Export {
 	e.AddCategory(categoryTime)
 	e.AddNode(categoryTime, count, countExport)
 	e.AddNode(categoryTime, trigger, triggerExport)
+
 	return e
 }

@@ -9,7 +9,7 @@ fi
 PLUGIN_PATH="$1"
 
 # URL of the plugin upload endpoint
-URL="http://localhost:8080/api/plugins/upload"
+URL="http://localhost:8080/api/plugins/upload?install=true"
 
 # Check if the path exists
 if [ ! -e "$PLUGIN_PATH" ]; then
@@ -20,7 +20,7 @@ fi
 cd "$PLUGIN_DIR"
 # Build the plugin
 echo "Building the plugin..."
-go build -buildmode=plugin -o plugin.so *go
+go build -buildmode=plugin -o nodes.so *go
 if [ $? -ne 0 ]; then
     echo "Error: Failed to build the plugin."
     exit 1
@@ -28,8 +28,8 @@ fi
 
 
 # Create a ZIP file containing only the built .so file
-ZIP_FILE="plugin.zip"
-zip "$ZIP_FILE" "plugin.so"
+ZIP_FILE="nodes-v1.0.0.zip"
+zip "$ZIP_FILE" "nodes.so"
 if [ ! -f "$ZIP_FILE" ]; then
     echo "Error: Failed to create ZIP file."
     exit 1
