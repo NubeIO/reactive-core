@@ -1,0 +1,30 @@
+{
+  "name": "my plugin",
+  "version": "v1.0",
+  "nodes": {
+    "category1": [
+      {
+        "id": "count",
+        "export": "Count",
+        "children": [
+          {
+            "id": "count",
+            "export": "Count"
+          }
+        ]
+      }
+    ],
+    "category2": [
+      {
+        "id": "count",
+        "export": "Count",
+        "children": [
+          {
+            "id": "count",
+            "export": "Count"
+          }
+        ]
+      }
+    ]
+  }
+}

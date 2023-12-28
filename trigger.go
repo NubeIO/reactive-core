@@ -7,6 +7,9 @@ import (
 	"time"
 )
 
+// exports
+var Trigger triggerFloat
+
 type portDataType string
 
 const (
@@ -24,7 +27,7 @@ type triggerFloat struct {
 
 // NewTriggerNode creates a new triggerFloat with the given ID, name, EventBus, and Flow.
 func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
-	node := reactive.NewBaseNode("trigger-float", nodeUUID, name, bus)
+	node := reactive.NewBaseNode(trigger, nodeUUID, name, bus)
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	if opts != nil {
 		node.Meta = opts.Meta
@@ -139,7 +142,3 @@ func (n *triggerBool) Delete() {
 func (n *triggerBool) BuildSchema() {
 
 }
-
-// exports
-var TriggerFloat triggerFloat
-var TriggerBool triggerBool

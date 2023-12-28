@@ -7,7 +7,7 @@ import (
 	"github.com/NubeIO/schema"
 )
 
-var CountNode countNode
+var Count countNode
 
 // countNode represents a node that counts incoming messages and sends out the count value.
 type countNode struct {
