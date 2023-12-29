@@ -16,21 +16,19 @@ type countNode struct {
 }
 
 // NewCountNode creates a new countNode with the given ID, name, and EventBus.
-func NewCountNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
+func NewCountNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	node := reactive.NewBaseNode("count", nodeUUID, name, bus)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetHotFix()
-	if opts != nil {
-		node.Meta = opts.Meta
-	}
+	node.SetMeta(opts)
 	return &countNode{
 		BaseNode: node,
 		count:    0,
 	}
 }
 
-func (n *countNode) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
+func (n *countNode) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	newNode := NewCountNode(nodeUUID, name, bus, settings, opts)
 	newNode.BuildSchema()
 	return newNode
