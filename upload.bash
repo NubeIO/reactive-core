@@ -9,7 +9,7 @@ fi
 PLUGIN_PATH="$1"
 
 # URL of the plugin upload endpoint
-URL="http://localhost:8080/api/plugins/upload?install=true"
+URL="http://localhost:1770/api/plugins/upload?install=true"
 
 # Check if the path exists
 if [ ! -e "$PLUGIN_PATH" ]; then
