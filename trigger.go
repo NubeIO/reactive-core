@@ -26,12 +26,10 @@ type triggerFloat struct {
 }
 
 // NewTriggerNode creates a new triggerFloat with the given ID, name, EventBus, and Flow.
-func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
+func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	node := reactive.NewBaseNode(trigger, nodeUUID, name, bus)
 	node.NewOutputPort(constants.Output, constants.Output, "float")
-	if opts != nil {
-		node.Meta = opts.Meta
-	}
+	node.SetMeta(opts)
 	return &triggerFloat{
 		BaseNode: node,
 		stop:     make(chan struct{}),
@@ -39,7 +37,7 @@ func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, settings *rea
 
 }
 
-func (n *triggerFloat) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
+func (n *triggerFloat) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	newNode := NewTriggerNode(nodeUUID, name, bus, settings, opts)
 	return newNode
 }
@@ -91,19 +89,17 @@ type triggerBool struct {
 	lastValue bool
 }
 
-func NewTriggerBool(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
+func NewTriggerBool(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	node := reactive.NewBaseNode("trigger-bool", nodeUUID, name, bus)
 	node.NewOutputPort(constants.Output, constants.Output, "float")
-	if opts != nil {
-		node.Meta = opts.Meta
-	}
+	node.SetMeta(opts)
 	return &triggerBool{
 		BaseNode: node,
 		stop:     make(chan struct{}),
 	}
 }
 
-func (n *triggerBool) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.NodeOpts) reactive.Node {
+func (n *triggerBool) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	newNode := NewTriggerBool(nodeUUID, name, bus, settings, opts)
 	return newNode
 }
