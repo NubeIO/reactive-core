@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/NubeIO/reactive"
 	"github.com/NubeIO/reactive-nodes/constants"
 	"github.com/NubeIO/reactive-nodes/helpers/pointers"
+	pprint "github.com/NubeIO/reactive-nodes/helpers/print"
 	"github.com/grid-x/modbus"
 	"log"
 	"time"
@@ -25,13 +27,12 @@ type modbusNetwork struct {
 }
 
 func NewModbusNetwork(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(modbusNetworkName, nodeUUID, name, bus)
+	node := reactive.NewBaseNode(modbusNetworkName, nodeUUID, name, bus, opts)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
 		Category: categoryModbus,
 	})
-	node.SetMeta(opts)
 	return &modbusNetwork{
 		BaseNode:     node,
 		pollInterval: time.Second * 2,
@@ -40,7 +41,7 @@ func NewModbusNetwork(nodeUUID, name string, bus *reactive.EventBus, settings *r
 
 func (n *modbusNetwork) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	newNode := NewModbusNetwork(nodeUUID, name, bus, settings, opts)
-	newNode.BuildSchema()
+	newNode.AddSchema()
 	return newNode
 }
 
@@ -85,10 +86,25 @@ func (n *modbusNetwork) pollDevices() {
 		if !ok {
 			continue
 		}
+
 		n.setDeviceAddr(parsedDevice.deviceAddr)
 		points := device.GetChildsByType(modbusPointName)
 
 		for _, point := range points {
+			mb := &pointSettings{}
+			err := point.GetDataByKey(modbusPointName, &mb)
+			if err != nil {
+				fmt.Println("data", err)
+				return
+			}
+
+			pprint.PrintJOSN(mb)
+			//modbusPoint.
+
+			//parsedPoint, ok := device.(*modbusPoint)
+			//if !ok {
+			//	continue
+			//}
 
 			data, err := n.client.ReadCoils(1, 1) // Example usage
 			fmt.Println(data)
@@ -114,14 +130,13 @@ type modbusDevice struct {
 }
 
 func NewModbusDevice(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(modbusDeviceName, nodeUUID, name, bus)
+	node := reactive.NewBaseNode(modbusDeviceName, nodeUUID, name, bus, opts)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
 		Category: categoryModbus,
 		ParentID: pointers.NewString(modbusNetworkName),
 	})
-	node.SetMeta(opts)
 	return &modbusDevice{
 		BaseNode:   node,
 		deviceAddr: 1,
@@ -130,36 +145,78 @@ func NewModbusDevice(nodeUUID, name string, bus *reactive.EventBus, settings *re
 
 func (n *modbusDevice) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	newNode := NewModbusDevice(nodeUUID, name, bus, settings, opts)
-	newNode.BuildSchema()
+	newNode.AddSchema()
 	return newNode
 }
 
 type modbusPoint struct {
 	*reactive.BaseNode
-	registerAddress int // Modbus register address
-	registerType    string
-	pollType        string
+	*pointSettings
 }
 
 func NewModbusPoint(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(modbusPointName, nodeUUID, name, bus)
+	node := reactive.NewBaseNode(modbusPointName, nodeUUID, name, bus, opts)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
 		Category: categoryModbus,
 		ParentID: pointers.NewString(modbusDeviceName),
 	})
-	node.SetMeta(opts)
-	return &modbusPoint{
-		BaseNode:        node,
-		registerAddress: 1,
-		registerType:    "holding",
-		pollType:        "read",
+	n := &modbusPoint{
+		BaseNode:      node,
+		pointSettings: nil,
 	}
+	n.AddSettings(settings)
+	return n
 }
 
 func (n *modbusPoint) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
 	newNode := NewModbusPoint(nodeUUID, name, bus, settings, opts)
-	newNode.BuildSchema()
+	newNode.AddSchema()
 	return newNode
+}
+
+type functionType string
+type requestType string
+
+const (
+	coil functionType = "coil"
+)
+const (
+	read requestType = "read"
+)
+
+type pointSettings struct {
+	Register uint16       `json:"register"`
+	Function functionType `json:"function"` // e.g., "coil"
+	Request  requestType  `json:"request"`  // e.g., "read" or "write"
+}
+
+func (n *pointSettings) register() uint16 {
+	return n.Register
+}
+func (n *pointSettings) function() functionType {
+	return n.Function
+}
+
+func (n *pointSettings) request() requestType {
+	return n.Request
+}
+
+func (n *modbusPoint) AddSettings(settings *reactive.Settings) {
+	out := &pointSettings{
+		Register: 3,
+		Function: coil,
+		Request:  read,
+	}
+	fmt.Println("############################")
+	marshal, err := json.Marshal(settings)
+	if err != nil {
+		fmt.Println(11111, err, "MODBUS POINT SETTINGS")
+
+		return
+	}
+	err = json.Unmarshal(marshal, &settings)
+	n.AddData(modbusPointName, out)
+	n.pointSettings = out
 }

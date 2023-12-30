@@ -1,41 +1,36 @@
 #!/bin/bash
 
-# Check if the directory or file path is provided
-if [ "$#" -ne 1 ]; then
-    echo "Usage: $0 <path_to_plugin_directory_or_file>"
+# Check if the correct number of arguments is provided
+if [ "$#" -ne 2 ]; then
+    echo "Usage: $0 <path_to_plugin_directory_or_file> <plugin_name>"
     exit 1
 fi
 
 PLUGIN_PATH="$1"
+PLUGIN_NAME="$2.so"
 
 # URL of the plugin upload endpoint
 URL="http://localhost:1770/api/plugins/upload?install=true"
 
-# Check if the path exists
-if [ ! -e "$PLUGIN_PATH" ]; then
-    echo "Error: Path not found!"
+# Check if the path exists and is a directory
+if [ ! -d "$PLUGIN_PATH" ]; then
+    echo "Error: Directory path not found!"
     exit 1
 fi
 
-cd "$PLUGIN_DIR"
+cd "$PLUGIN_PATH"
+
 # Build the plugin
 echo "Building the plugin..."
-go build -buildmode=plugin -o nodes.so *go
+go build -buildmode=plugin -o "$PLUGIN_NAME" *go
 if [ $? -ne 0 ]; then
     echo "Error: Failed to build the plugin."
     exit 1
 fi
 
-
 # Create a ZIP file containing only the built .so file
-ZIP_FILE="nodes-v1.0.0.zip"
-zip "$ZIP_FILE" "nodes.so"
-if [ ! -f "$ZIP_FILE" ]; then
-    echo "Error: Failed to create ZIP file."
-    exit 1
-fi
-
-# Check if the zip operation was successful
+ZIP_FILE="${PLUGIN_NAME%.*}.zip"
+zip "$ZIP_FILE" "$PLUGIN_NAME"
 if [ ! -f "$ZIP_FILE" ]; then
     echo "Error: Failed to create ZIP file."
     exit 1
@@ -45,5 +40,5 @@ fi
 echo "Uploading $ZIP_FILE..."
 curl -X POST -F "file=@$ZIP_FILE" $URL
 
-# Optional: Remove the ZIP file after upload
-# rm "$ZIP_FILE"
+rm "$ZIP_FILE"
+rm "$PLUGIN_NAME"
