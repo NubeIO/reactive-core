@@ -22,7 +22,8 @@ cd "$PLUGIN_PATH"
 
 # Build the plugin
 echo "Building the plugin..."
-go build -buildmode=plugin -o "$PLUGIN_NAME" *go
+go build -ldflags "-s -w" -buildmode=plugin -o "$PLUGIN_NAME"  *go
+
 if [ $? -ne 0 ]; then
     echo "Error: Failed to build the plugin."
     exit 1

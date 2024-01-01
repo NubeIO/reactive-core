@@ -17,7 +17,7 @@ type countNode struct {
 
 // NewCountNode creates a new countNode with the given ID, name, and EventBus.
 func NewCountNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(count, nodeUUID, name, bus, opts)
+	node := reactive.NewBaseNode(reactive.NodeInfo(count, nodeUUID, name, pluginName), bus, opts)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetHotFix()

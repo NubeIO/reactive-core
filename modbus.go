@@ -6,9 +6,7 @@ import (
 	"github.com/NubeIO/reactive"
 	"github.com/NubeIO/reactive-nodes/constants"
 	"github.com/NubeIO/reactive-nodes/helpers/pointers"
-	pprint "github.com/NubeIO/reactive-nodes/helpers/print"
 	"github.com/grid-x/modbus"
-	"log"
 	"time"
 )
 
@@ -27,16 +25,19 @@ type modbusNetwork struct {
 }
 
 func NewModbusNetwork(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(modbusNetworkName, nodeUUID, name, bus, opts)
+	node := reactive.NewBaseNode(reactive.NodeInfo(modbusNetworkName, nodeUUID, name, pluginName), bus, opts)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
-		Category: categoryModbus,
+		Category:  categoryModbus,
+		HasDB:     true,
+		HasLogger: true,
 	})
-	return &modbusNetwork{
+	n := &modbusNetwork{
 		BaseNode:     node,
 		pollInterval: time.Second * 2,
 	}
+	return n
 }
 
 func (n *modbusNetwork) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
@@ -80,13 +81,13 @@ func (n *modbusNetwork) Start() {
 
 // pollDevices performs the Modbus read operation for each point in each device
 func (n *modbusNetwork) pollDevices() {
+	logger := n.SetTracer("polling")
 	devices := n.GetChildsByType(modbusDeviceName)
 	for _, device := range devices {
 		parsedDevice, ok := device.(*modbusDevice)
 		if !ok {
 			continue
 		}
-
 		n.setDeviceAddr(parsedDevice.deviceAddr)
 		points := device.GetChildsByType(modbusPointName)
 
@@ -94,25 +95,16 @@ func (n *modbusNetwork) pollDevices() {
 			mb := &pointSettings{}
 			err := point.GetDataByKey(modbusPointName, &mb)
 			if err != nil {
-				fmt.Println("data", err)
+				logger.Debug("read", "func.GetDataByKey()", "err:", err.Error())
 				return
 			}
 
-			pprint.PrintJOSN(mb)
-			//modbusPoint.
-
-			//parsedPoint, ok := device.(*modbusPoint)
-			//if !ok {
-			//	continue
-			//}
-
+			logger.Info("read-coil", "addr:", 1, "count:", 1)
 			data, err := n.client.ReadCoils(1, 1) // Example usage
-			fmt.Println(data)
 			if err != nil {
-				log.Printf("Error reading Modbus device %s: %v", device.GetID(), err)
+				logger.Error("read-coil", "addr:", 1, "count:", 1, "err:", err.Error())
 				continue
 			} else {
-				log.Printf("modbus-read %s", data)
 
 			}
 			// Update point value
@@ -130,7 +122,7 @@ type modbusDevice struct {
 }
 
 func NewModbusDevice(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(modbusDeviceName, nodeUUID, name, bus, opts)
+	node := reactive.NewBaseNode(reactive.NodeInfo(modbusDeviceName, nodeUUID, name, pluginName), bus, opts)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
@@ -155,7 +147,7 @@ type modbusPoint struct {
 }
 
 func NewModbusPoint(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(modbusPointName, nodeUUID, name, bus, opts)
+	node := reactive.NewBaseNode(reactive.NodeInfo(modbusPointName, nodeUUID, name, pluginName), bus, opts)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
