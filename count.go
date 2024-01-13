@@ -16,21 +16,20 @@ type countNode struct {
 }
 
 // NewCountNode creates a new countNode with the given ID, name, and EventBus.
-func NewCountNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode("count", nodeUUID, name, bus)
+func NewCountNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	node := reactive.NewBaseNode(reactive.NodeInfo(count, nodeUUID, name, pluginName), bus)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetHotFix()
-	node.SetMeta(opts)
 	return &countNode{
 		BaseNode: node,
 		count:    0,
 	}
 }
 
-func (n *countNode) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	newNode := NewCountNode(nodeUUID, name, bus, settings, opts)
-	newNode.BuildSchema()
+func (n *countNode) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	newNode := NewCountNode(nodeUUID, name, bus, settings)
+	newNode.AddSchema()
 	return newNode
 }
 
@@ -68,7 +67,7 @@ type countNodeSettings struct {
 	StartCount int
 }
 
-func (n *countNode) BuildSchema() {
+func (n *countNode) AddSchema() {
 
 	//builder := schema.NewSchemaBuilder("HEY")
 	//
@@ -78,7 +77,7 @@ func (n *countNode) BuildSchema() {
 	//ui := schema.UI{}
 	//ui.AddUIOrder([]string{"exampleString", "exampleNumber"})
 	//out := &schema.Generated{
-	//	Schema: builder.Build(),
+	//	schema: builder.Build(),
 	//	UI:     ui,
 	//}
 
