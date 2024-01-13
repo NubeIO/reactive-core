@@ -26,8 +26,8 @@ type triggerFloat struct {
 }
 
 // NewTriggerNode creates a new triggerFloat with the given ID, name, EventBus, and Flow.
-func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(trigger, nodeUUID, name, pluginName), bus, opts)
+func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	node := reactive.NewBaseNode(reactive.NodeInfo(trigger, nodeUUID, name, pluginName), bus)
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	return &triggerFloat{
 		BaseNode: node,
@@ -36,8 +36,8 @@ func NewTriggerNode(nodeUUID, name string, bus *reactive.EventBus, settings *rea
 
 }
 
-func (n *triggerFloat) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	newNode := NewTriggerNode(nodeUUID, name, bus, settings, opts)
+func (n *triggerFloat) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	newNode := NewTriggerNode(nodeUUID, name, bus, settings)
 	return newNode
 }
 

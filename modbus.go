@@ -24,14 +24,15 @@ type modbusNetwork struct {
 	isRTUNetwork bool
 }
 
-func NewModbusNetwork(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(modbusNetworkName, nodeUUID, name, pluginName), bus, opts)
+func NewModbusNetwork(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	node := reactive.NewBaseNode(reactive.NodeInfo(modbusNetworkName, nodeUUID, name, pluginName), bus)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
 		Category:  categoryModbus,
 		HasDB:     true,
 		HasLogger: true,
+		HasSystem: true,
 	})
 	n := &modbusNetwork{
 		BaseNode:     node,
@@ -40,8 +41,8 @@ func NewModbusNetwork(nodeUUID, name string, bus *reactive.EventBus, settings *r
 	return n
 }
 
-func (n *modbusNetwork) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	newNode := NewModbusNetwork(nodeUUID, name, bus, settings, opts)
+func (n *modbusNetwork) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	newNode := NewModbusNetwork(nodeUUID, name, bus, settings)
 	newNode.AddSchema()
 	return newNode
 }
@@ -121,13 +122,14 @@ type modbusDevice struct {
 	deviceAddr int
 }
 
-func NewModbusDevice(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(modbusDeviceName, nodeUUID, name, pluginName), bus, opts)
+func NewModbusDevice(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	node := reactive.NewBaseNode(reactive.NodeInfo(modbusDeviceName, nodeUUID, name, pluginName), bus)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
-		Category: categoryModbus,
-		ParentID: pointers.NewString(modbusNetworkName),
+		Category:  categoryModbus,
+		ParentID:  pointers.NewString(modbusNetworkName),
+		HasSystem: true,
 	})
 	return &modbusDevice{
 		BaseNode:   node,
@@ -135,8 +137,8 @@ func NewModbusDevice(nodeUUID, name string, bus *reactive.EventBus, settings *re
 	}
 }
 
-func (n *modbusDevice) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	newNode := NewModbusDevice(nodeUUID, name, bus, settings, opts)
+func (n *modbusDevice) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	newNode := NewModbusDevice(nodeUUID, name, bus, settings)
 	newNode.AddSchema()
 	return newNode
 }
@@ -146,8 +148,8 @@ type modbusPoint struct {
 	*pointSettings
 }
 
-func NewModbusPoint(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(modbusPointName, nodeUUID, name, pluginName), bus, opts)
+func NewModbusPoint(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	node := reactive.NewBaseNode(reactive.NodeInfo(modbusPointName, nodeUUID, name, pluginName), bus)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetDetails(&reactive.Details{
@@ -162,8 +164,8 @@ func NewModbusPoint(nodeUUID, name string, bus *reactive.EventBus, settings *rea
 	return n
 }
 
-func (n *modbusPoint) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings, opts *reactive.Options) reactive.Node {
-	newNode := NewModbusPoint(nodeUUID, name, bus, settings, opts)
+func (n *modbusPoint) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+	newNode := NewModbusPoint(nodeUUID, name, bus, settings)
 	newNode.AddSchema()
 	return newNode
 }
