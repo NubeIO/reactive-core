@@ -14,23 +14,23 @@ var Trigger triggerFloat
 
 // triggerFloat generates random values at regular intervals.
 type triggerFloat struct {
-	rxlib.Node
+	rxlib.Object
 	stop chan struct{}
 }
 
-// NewTriggerNode creates a new triggerFloat with the given ID, name, EventBus, and Flow.
-func NewTriggerNode(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(trigger, nodeUUID, name, pluginName), bus)
-	node.NewOutputPort(constants.Output, constants.Output, "float")
+// NewTriggerObject creates a new triggerFloat with the given ID, name, EventBus, and Flow.
+func NewTriggerObject(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	object := reactive.NewBaseObject(reactive.ObjectInfo(trigger, objectUUID, name, pluginName), bus)
+	object.NewOutputPort(constants.Output, constants.Output, "float")
 	return &triggerFloat{
-		Node: node,
-		stop: make(chan struct{}),
+		Object: object,
+		stop:   make(chan struct{}),
 	}
 }
 
-func (n *triggerFloat) New(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	newNode := NewTriggerNode(nodeUUID, name, bus, settings)
-	return newNode
+func (n *triggerFloat) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	newObject := NewTriggerObject(objectUUID, name, bus, settings)
+	return newObject
 }
 
 func (n *triggerFloat) Start() {
@@ -62,7 +62,7 @@ func (n *triggerFloat) Start() {
 
 func (n *triggerFloat) Delete() {
 	close(n.stop)
-	n.RemoveNodeFromRuntime()
+	n.RemoveObjectFromRuntime()
 }
 
 func randFloat() float64 {

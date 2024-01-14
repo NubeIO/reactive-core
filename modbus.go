@@ -16,7 +16,7 @@ var ModbusDevice modbusDevice
 var ModbusPoint modbusPoint
 
 type modbusNetwork struct {
-	rxlib.Node
+	rxlib.Object
 	pollInterval time.Duration // Interval between polls
 	stopChannel  chan struct{} // Channel to signal stopping of polling
 	client       modbus.Client
@@ -25,25 +25,25 @@ type modbusNetwork struct {
 	isRTUNetwork bool
 }
 
-func NewModbusNetwork(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(modbusNetworkName, nodeUUID, name, pluginName), bus)
-	node.NewInputPort(constants.Input, constants.Input, "any")
-	node.NewOutputPort(constants.Output, constants.Output, "float")
-	node.SetDetails(&rxlib.Details{
+func NewModbusNetwork(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	object := reactive.NewBaseObject(reactive.ObjectInfo(modbusNetworkName, objectUUID, name, pluginName), bus)
+	object.NewInputPort(constants.Input, constants.Input, "any")
+	object.NewOutputPort(constants.Output, constants.Output, "float")
+	object.SetDetails(&rxlib.Details{
 		Category:    categoryModbus,
 		HasServices: true,
 	})
 	n := &modbusNetwork{
-		Node:         node,
+		Object:       object,
 		pollInterval: time.Second * 2,
 	}
 	return n
 }
 
-func (n *modbusNetwork) New(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	newNode := NewModbusNetwork(nodeUUID, name, bus, settings)
-	newNode.AddSchema()
-	return newNode
+func (n *modbusNetwork) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	newObject := NewModbusNetwork(objectUUID, name, bus, settings)
+	newObject.AddSchema()
+	return newObject
 }
 
 func (n *modbusNetwork) setClient() modbus.Client {
@@ -109,7 +109,7 @@ func (n *modbusNetwork) pollDevices() {
 
 			}
 			// Update point value
-			device.SetLastValueChildNode(point.GetUUID(), &rxlib.Port{
+			device.SetLastValueChildObject(point.GetUUID(), &rxlib.Port{
 				ID:    constants.Output,
 				Value: data,
 			})
@@ -118,56 +118,56 @@ func (n *modbusNetwork) pollDevices() {
 }
 
 type modbusDevice struct {
-	rxlib.Node
+	rxlib.Object
 	deviceAddr int
 }
 
-func NewModbusDevice(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(modbusDeviceName, nodeUUID, name, pluginName), bus)
-	node.NewInputPort(constants.Input, constants.Input, "any")
-	node.NewOutputPort(constants.Output, constants.Output, "float")
-	node.SetDetails(&rxlib.Details{
+func NewModbusDevice(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	object := reactive.NewBaseObject(reactive.ObjectInfo(modbusDeviceName, objectUUID, name, pluginName), bus)
+	object.NewInputPort(constants.Input, constants.Input, "any")
+	object.NewOutputPort(constants.Output, constants.Output, "float")
+	object.SetDetails(&rxlib.Details{
 		Category:    categoryModbus,
 		ParentID:    pointers.NewString(modbusNetworkName),
 		HasServices: true,
 	})
 	return &modbusDevice{
-		Node:       node,
+		Object:     object,
 		deviceAddr: 1,
 	}
 }
 
-func (n *modbusDevice) New(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	newNode := NewModbusDevice(nodeUUID, name, bus, settings)
-	newNode.AddSchema()
-	return newNode
+func (n *modbusDevice) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	newObject := NewModbusDevice(objectUUID, name, bus, settings)
+	newObject.AddSchema()
+	return newObject
 }
 
 type modbusPoint struct {
-	rxlib.Node
+	rxlib.Object
 	*pointSettings
 }
 
-func NewModbusPoint(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(modbusPointName, nodeUUID, name, pluginName), bus)
-	node.NewInputPort(constants.Input, constants.Input, "any")
-	node.NewOutputPort(constants.Output, constants.Output, "float")
-	node.SetDetails(&rxlib.Details{
+func NewModbusPoint(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	object := reactive.NewBaseObject(reactive.ObjectInfo(modbusPointName, objectUUID, name, pluginName), bus)
+	object.NewInputPort(constants.Input, constants.Input, "any")
+	object.NewOutputPort(constants.Output, constants.Output, "float")
+	object.SetDetails(&rxlib.Details{
 		Category: categoryModbus,
 		ParentID: pointers.NewString(modbusDeviceName),
 	})
 	n := &modbusPoint{
-		Node:          node,
+		Object:        object,
 		pointSettings: nil,
 	}
 	n.AddSettings(settings)
 	return n
 }
 
-func (n *modbusPoint) New(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	newNode := NewModbusPoint(nodeUUID, name, bus, settings)
-	newNode.AddSchema()
-	return newNode
+func (n *modbusPoint) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	newObject := NewModbusPoint(objectUUID, name, bus, settings)
+	newObject.AddSchema()
+	return newObject
 }
 
 type functionType string

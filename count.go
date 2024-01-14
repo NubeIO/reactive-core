@@ -8,34 +8,34 @@ import (
 	"github.com/NubeIO/schema"
 )
 
-var Count countNode
+var Count countObject
 
-// countNode represents a node that counts incoming messages and sends out the count value.
-type countNode struct {
-	//*reactive.BaseNode
-	rxlib.Node
+// countObject represents a object that counts incoming messages and sends out the count value.
+type countObject struct {
+	//*reactive.BaseObject
+	rxlib.Object
 	count int
 }
 
-// NewCountNode creates a new countNode with the given ID, name, and EventBus.
-func NewCountNode(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	node := reactive.NewBaseNode(reactive.NodeInfo(count, nodeUUID, name, pluginName), bus)
-	node.NewInputPort(constants.Input, constants.Input, "any")
-	node.NewOutputPort(constants.Output, constants.Output, "float")
-	node.SetHotFix()
-	return &countNode{
-		//Node:  node,
-		count: 0,
+// NewCountObject creates a new countObject with the given ID, name, and EventBus.
+func NewCountObject(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	object := reactive.NewBaseObject(reactive.ObjectInfo(count, objectUUID, name, pluginName), bus)
+	object.NewInputPort(constants.Input, constants.Input, "any")
+	object.NewOutputPort(constants.Output, constants.Output, "float")
+	object.SetHotFix()
+	return &countObject{
+		Object: object,
+		count:  0,
 	}
 }
 
-func (n *countNode) New(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
-	newNode := NewCountNode(nodeUUID, name, bus, settings)
-	newNode.AddSchema()
-	return newNode
+func (n *countObject) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
+	newObject := NewCountObject(objectUUID, name, bus, settings)
+	newObject.AddSchema()
+	return newObject
 }
 
-func (n *countNode) Start() {
+func (n *countObject) Start() {
 	if n.NotLoaded() {
 		n.SetLoaded(true)
 		inputChannel, exists := n.BusChannel(constants.Input)
@@ -65,11 +65,11 @@ func (n *countNode) Start() {
 
 }
 
-type countNodeSettings struct {
+type countObjectSettings struct {
 	StartCount int
 }
 
-func (n *countNode) AddSchema() {
+func (n *countObject) AddSchema() {
 
 	//builder := schema.NewSchemaBuilder("HEY")
 	//

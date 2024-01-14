@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	pprint "github.com/NubeIO/reactive-nodes/helpers/print"
 	"github.com/NubeIO/reactive/plugins"
 )
 
@@ -29,18 +30,32 @@ const modbusPointExport = "ModbusPoint"
 type pluginExport struct{}
 
 func (p *pluginExport) Get() *plugins.Export {
+	fmt.Println("GET PLUGIN EXPORT")
 	e := plugins.NewPlugin(pluginName, pluginVersion, "a new plugin")
-
+	var err error
 	e.AddCategory(categoryTime)
-	e.AddCategory(categoryCount)
-	e.AddCategory(categoryModbus)
-	e.AddNode(categoryTime, count, countExport)
-	e.AddNode(categoryTime, trigger, triggerExport)
+	//e.AddCategory(categoryCount)
+	//e.AddCategory(categoryModbus)
+	//err = e.AddObject(categoryTime, count, countExport)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	err = e.AddObject(categoryTime, trigger, triggerExport)
+	if err != nil {
+		fmt.Println(err)
+	}
 
 	// modbus
-	e.AddNode(categoryModbus, modbusNetworkName, modbusNetworkExport)
-	err := e.AddChildNode(categoryModbus, modbusNetworkName, modbusDeviceName, modbusDeviceExport)
-	err = e.AddChildNode(categoryModbus, modbusDeviceName, modbusPointName, modbusPointExport)
+	//err = e.AddObject(categoryModbus, modbusNetworkName, modbusNetworkExport)
+	//if err != nil {
+	//	fmt.Println(err)
+	//}
+	//err = e.AddChildObject(categoryModbus, modbusNetworkName, modbusDeviceName, modbusDeviceExport)
+	//fmt.Println(err)
+	//err = e.AddChildObject(categoryModbus, modbusDeviceName, modbusPointName, modbusPointExport)
+	//fmt.Println(err)
+
+	pprint.PrintJOSN(e)
 	fmt.Println(err)
 	return e
 }
