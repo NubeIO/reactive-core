@@ -1,3 +1,7 @@
+github.com/NubeIO/reactive v0.0.6 h1:sxf6ueNOQIDheZb8jYUp4bNqktZNSQtHDfCh5nMtvMs=
+github.com/NubeIO/reactive v0.0.6/go.mod h1:9usqprFZPN5PfWEC9pax+djdg0fNqUyi0Tp4AXu7dp0=
+github.com/NubeIO/rxlib v0.0.2 h1:zl4c/Z0hoa2MX5o19A7qCehVpiXNpD/W39m1DiG2aHE=
+github.com/NubeIO/rxlib v0.0.2/go.mod h1:/t9v2NKCZNmt3gT8G09jl+90xmOJMcmTV3FL7gUMIV0=
 github.com/NubeIO/schema v0.0.1 h1:/H3g7Qex1nA6RpwrzxsyP0+qblbljmnRZaAzfXbAYXU=
 github.com/NubeIO/schema v0.0.1/go.mod h1:l22AbV+69tAsjh4iIvQsaI7rzwiTQ8pHpbO16D4W1IE=
 github.com/google/go-cmp v0.5.6 h1:BKbKCqvP6I+rmFHt06ZmyQtvB8xAkWdhFyr0ZUNZcxQ=
