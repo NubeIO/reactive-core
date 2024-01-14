@@ -1,8 +1,8 @@
 module github.com/NubeIO/reactive-nodes
 
 go 1.21.5
-
-//replace github.com/NubeIO/reactive => /home/aidan/code/go/reactive
+replace github.com/NubeIO/rxlib => /home/aidan/code/go/rxlib
+replace github.com/NubeIO/reactive => /home/aidan/code/go/reactive
 
 require (
 	github.com/NubeIO/reactive v0.0.5
@@ -11,6 +11,7 @@ require (
 )
 
 require (
+	github.com/NubeIO/rxlib v0.0.1 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/gorilla/websocket v1.5.1 // indirect

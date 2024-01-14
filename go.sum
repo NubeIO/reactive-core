@@ -1,5 +1,7 @@
 github.com/NubeIO/reactive v0.0.5 h1:zaq6qWqUZaNbUV0DZOFETd58LaoxmG7dL837P+n5Gd8=
 github.com/NubeIO/reactive v0.0.5/go.mod h1:2NckeuqjqPq53aO+BlFZ+sZv+JSnObtUqnm+nRgAkIg=
+github.com/NubeIO/rxlib v0.0.1 h1:sGkDnksmgkaT7eyjva57oVSdCz2AQpxu0omhTRkZC7c=
+github.com/NubeIO/rxlib v0.0.1/go.mod h1:/t9v2NKCZNmt3gT8G09jl+90xmOJMcmTV3FL7gUMIV0=
 github.com/NubeIO/schema v0.0.1 h1:/H3g7Qex1nA6RpwrzxsyP0+qblbljmnRZaAzfXbAYXU=
 github.com/NubeIO/schema v0.0.1/go.mod h1:l22AbV+69tAsjh4iIvQsaI7rzwiTQ8pHpbO16D4W1IE=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

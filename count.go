@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/NubeIO/reactive"
 	"github.com/NubeIO/reactive-nodes/constants"
+	"github.com/NubeIO/rxlib"
 	"github.com/NubeIO/schema"
 )
 
@@ -11,23 +12,24 @@ var Count countNode
 
 // countNode represents a node that counts incoming messages and sends out the count value.
 type countNode struct {
-	*reactive.BaseNode
+	//*reactive.BaseNode
+	rxlib.Node
 	count int
 }
 
 // NewCountNode creates a new countNode with the given ID, name, and EventBus.
-func NewCountNode(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+func NewCountNode(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
 	node := reactive.NewBaseNode(reactive.NodeInfo(count, nodeUUID, name, pluginName), bus)
 	node.NewInputPort(constants.Input, constants.Input, "any")
 	node.NewOutputPort(constants.Output, constants.Output, "float")
 	node.SetHotFix()
 	return &countNode{
-		BaseNode: node,
-		count:    0,
+		//Node:  node,
+		count: 0,
 	}
 }
 
-func (n *countNode) New(nodeUUID, name string, bus *reactive.EventBus, settings *reactive.Settings) reactive.Node {
+func (n *countNode) New(nodeUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Node {
 	newNode := NewCountNode(nodeUUID, name, bus, settings)
 	newNode.AddSchema()
 	return newNode
@@ -36,7 +38,7 @@ func (n *countNode) New(nodeUUID, name string, bus *reactive.EventBus, settings 
 func (n *countNode) Start() {
 	if n.NotLoaded() {
 		n.SetLoaded(true)
-		inputChannel, exists := n.Bus[constants.Input]
+		inputChannel, exists := n.BusChannel(constants.Input)
 
 		if !exists {
 			fmt.Printf("Input channel for target input %s does not exist\n", constants.Input)
@@ -50,7 +52,7 @@ func (n *countNode) Start() {
 			// Increment the count for each incoming message
 			n.count++
 			// Create a Port with the count value and send it to the output
-			countPort := &reactive.Port{
+			countPort := &rxlib.Port{
 				ID:        constants.Output,
 				Name:      constants.Output,
 				Value:     float64(n.count), // Convert count to float64
@@ -116,5 +118,5 @@ func (n *countNode) AddSchema() {
 	out := &schema.Generated{
 		Schema: builder.Build(),
 	}
-	n.Schema = out
+	n.BuildSchema(out)
 }
