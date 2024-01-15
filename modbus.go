@@ -6,6 +6,8 @@ import (
 	"github.com/NubeIO/reactive"
 	"github.com/NubeIO/reactive-nodes/constants"
 	"github.com/NubeIO/reactive-nodes/helpers/pointers"
+	"github.com/NubeIO/reactive-nodes/rxcli"
+	"github.com/NubeIO/rxclient"
 	"github.com/NubeIO/rxlib"
 	"github.com/grid-x/modbus"
 	"time"
@@ -29,9 +31,10 @@ func NewModbusNetwork(objectUUID, name string, bus *rxlib.EventBus, settings *rx
 	object := reactive.NewBaseObject(reactive.ObjectInfo(modbusNetworkName, objectUUID, name, pluginName), bus)
 	object.NewInputPort(constants.Input, constants.Input, "any")
 	object.NewOutputPort(constants.Output, constants.Output, "float")
+	object.AddDefinedChildObjects(modbusDeviceName)
 	object.SetDetails(&rxlib.Details{
-		Category:    categoryModbus,
-		HasServices: true,
+		Category:   categoryModbus,
+		ObjectType: rxlib.Driver,
 	})
 	n := &modbusNetwork{
 		Object:       object,
@@ -42,7 +45,6 @@ func NewModbusNetwork(objectUUID, name string, bus *rxlib.EventBus, settings *rx
 
 func (n *modbusNetwork) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
 	newObject := NewModbusNetwork(objectUUID, name, bus, settings)
-	newObject.AddSchema()
 	return newObject
 }
 
@@ -126,10 +128,11 @@ func NewModbusDevice(objectUUID, name string, bus *rxlib.EventBus, settings *rxl
 	object := reactive.NewBaseObject(reactive.ObjectInfo(modbusDeviceName, objectUUID, name, pluginName), bus)
 	object.NewInputPort(constants.Input, constants.Input, "any")
 	object.NewOutputPort(constants.Output, constants.Output, "float")
+	object.AddDefinedChildObjects(modbusPointName)
 	object.SetDetails(&rxlib.Details{
-		Category:    categoryModbus,
-		ParentID:    pointers.NewString(modbusNetworkName),
-		HasServices: true,
+		Category:   categoryModbus,
+		ObjectType: rxlib.Driver,
+		ParentID:   pointers.NewString(modbusNetworkName),
 	})
 	return &modbusDevice{
 		Object:     object,
@@ -139,13 +142,13 @@ func NewModbusDevice(objectUUID, name string, bus *rxlib.EventBus, settings *rxl
 
 func (n *modbusDevice) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
 	newObject := NewModbusDevice(objectUUID, name, bus, settings)
-	newObject.AddSchema()
 	return newObject
 }
 
 type modbusPoint struct {
 	rxlib.Object
 	*pointSettings
+	rxClient rxclient.RxClient
 }
 
 func NewModbusPoint(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
@@ -153,12 +156,18 @@ func NewModbusPoint(objectUUID, name string, bus *rxlib.EventBus, settings *rxli
 	object.NewInputPort(constants.Input, constants.Input, "any")
 	object.NewOutputPort(constants.Output, constants.Output, "float")
 	object.SetDetails(&rxlib.Details{
-		Category: categoryModbus,
-		ParentID: pointers.NewString(modbusDeviceName),
+		Category:   categoryModbus,
+		ObjectType: rxlib.Driver,
+		ParentID:   pointers.NewString(modbusDeviceName),
 	})
+	rx, err := rxcli.RxClient()
+	if err != nil {
+		object.AddValidationResult("rx-client-init", fmt.Sprintf("error on init: %v", err))
+	}
 	n := &modbusPoint{
 		Object:        object,
 		pointSettings: nil,
+		rxClient:      rx,
 	}
 	n.AddSettings(settings)
 	return n
@@ -166,8 +175,15 @@ func NewModbusPoint(objectUUID, name string, bus *rxlib.EventBus, settings *rxli
 
 func (n *modbusPoint) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
 	newObject := NewModbusPoint(objectUUID, name, bus, settings)
-	newObject.AddSchema()
 	return newObject
+}
+
+// RunValidation example of a validation on adding a new point
+func (n *modbusPoint) RunValidation() {
+	validation := make(map[string]any)
+
+	validation["addingPoint"] = "the same register type as already been added before"
+	n.SetValidationResult(validation)
 }
 
 type functionType string
@@ -203,10 +219,9 @@ func (n *modbusPoint) AddSettings(settings *rxlib.Settings) {
 		Function: coil,
 		Request:  read,
 	}
-	fmt.Println("############################")
+
 	marshal, err := json.Marshal(settings)
 	if err != nil {
-		fmt.Println(11111, err, "MODBUS POINT SETTINGS")
 
 		return
 	}

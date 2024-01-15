@@ -12,7 +12,6 @@ var Count countObject
 
 // countObject represents a object that counts incoming messages and sends out the count value.
 type countObject struct {
-	//*reactive.BaseObject
 	rxlib.Object
 	count int
 }
@@ -31,7 +30,7 @@ func NewCountObject(objectUUID, name string, bus *rxlib.EventBus, settings *rxli
 
 func (n *countObject) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
 	newObject := NewCountObject(objectUUID, name, bus, settings)
-	newObject.AddSchema()
+
 	return newObject
 }
 
@@ -69,7 +68,7 @@ type countObjectSettings struct {
 	StartCount int
 }
 
-func (n *countObject) AddSchema() {
+func (n *countObject) CallSchema() *schema.Generated {
 
 	//builder := schema.NewSchemaBuilder("HEY")
 	//
@@ -118,5 +117,5 @@ func (n *countObject) AddSchema() {
 	out := &schema.Generated{
 		Schema: builder.Build(),
 	}
-	n.BuildSchema(out)
+	return out
 }
