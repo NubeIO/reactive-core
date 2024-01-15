@@ -5,7 +5,9 @@ import (
 	"github.com/NubeIO/reactive"
 	"github.com/NubeIO/reactive-nodes/constants"
 	"github.com/NubeIO/rxlib"
+	"github.com/gin-gonic/gin"
 	"math/rand"
+	"net/http"
 	"time"
 )
 
@@ -22,10 +24,23 @@ type triggerFloat struct {
 func NewTriggerObject(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {
 	object := reactive.NewBaseObject(reactive.ObjectInfo(trigger, objectUUID, name, pluginName), bus)
 	object.NewOutputPort(constants.Output, constants.Output, "float")
+	object.AddDependencies(&rxlib.Dependencies{
+		RequiresRouter: true,
+	})
 	return &triggerFloat{
 		Object: object,
 		stop:   make(chan struct{}),
 	}
+}
+
+func (n *triggerFloat) getResp(c *gin.Context) {
+	fmt.Println("GET ROUTE !!!!!!!!!!!!!!!!!!!!!!!!!!!11")
+	c.JSON(http.StatusOK, "fuck ya")
+}
+
+func (n *triggerFloat) AddRouterGroup(r *gin.RouterGroup) {
+	fmt.Println("NEW ROUTE !!!!!!!!!!!!!!!!!!!!!!!!!!!11")
+	r.GET("/myplugin/get", n.getResp)
 }
 
 func (n *triggerFloat) New(objectUUID, name string, bus *rxlib.EventBus, settings *rxlib.Settings) rxlib.Object {

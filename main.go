@@ -11,6 +11,9 @@ var Plugin pluginExport
 const pluginName = "my plugin"
 const pluginVersion = "v1.0"
 
+const categoryNetworkingDHCP = "networking-dhcp"
+const dhcpName = "dhcp"
+
 const categoryTime = "time"
 const trigger = "trigger"
 const triggerExport = "Trigger"
@@ -30,7 +33,6 @@ const modbusPointExport = "ModbusPoint"
 type pluginExport struct{}
 
 func (p *pluginExport) Get() *plugins.Export {
-	fmt.Println("GET PLUGIN EXPORT")
 	e := plugins.NewPlugin(pluginName, pluginVersion, "a new plugin")
 	var err error
 	e.AddCategory(categoryTime)
