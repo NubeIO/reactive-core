@@ -68,7 +68,7 @@ def compare_go_mod(go_mod_paths):
                 if version1 != version2:
                     if dependency not in version_mismatches:
                         version_mismatches[dependency] = []
-                    version_mismatches[dependency].append(f"ERROR: {dir_name1}: {version1} | {dir_name2}: {version2}")
+                    version_mismatches[dependency].append(f"DIFFERENT-VERSIONS: {dir_name1}: {version1} | {dir_name2}: {version2}")
 
     return version_mismatches
 
@@ -128,7 +128,7 @@ def main():
 
         if version_mismatches:
             for dependency, mismatches in version_mismatches.items():
-                print(f"{dependency}:")
+                print(f"{dependency}")
                 for mismatch in mismatches:
                     print(mismatch)
         else:
