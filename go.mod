@@ -8,7 +8,7 @@ replace github.com/NubeIO/reactive => /home/aidan/code/go/reactive
 
 require (
 	github.com/NubeIO/reactive v0.0.7
-	github.com/NubeIO/rxclient v0.0.2
+	github.com/NubeIO/rxclient v0.0.3
 	github.com/NubeIO/rxlib v0.0.2
 	github.com/NubeIO/schema v0.0.1
 	github.com/gin-gonic/gin v1.9.1

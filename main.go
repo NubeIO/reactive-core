@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	pprint "github.com/NubeIO/reactive-nodes/helpers/print"
+	"github.com/NubeIO/reactive-nodes/rxcli"
 	"github.com/NubeIO/reactive/plugins"
 )
 
@@ -34,6 +35,9 @@ type pluginExport struct{}
 
 func (p *pluginExport) Get() *plugins.Export {
 	e := plugins.NewPlugin(pluginName, pluginVersion, "a new plugin")
+
+	go rxcli.RxClient()
+
 	var err error
 	e.AddCategory(categoryTime)
 	//e.AddCategory(categoryCount)
